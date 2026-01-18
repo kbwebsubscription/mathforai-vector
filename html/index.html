@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Vectors for Data Science: A Beginner's Guide | Learn Vector Math for ML</title>
+    <meta name="description" content="Learn vector operations for machine learning with beginner-friendly marketing examples. Master dot products, vector addition, and more with hands-on Python code.">
+    <meta name="keywords" content="vectors, data science, machine learning, linear algebra, dot product, feature vectors, Python NumPy, beginner tutorial">
+    <meta name="author" content="Your Name">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Vectors for Data Science: A Beginner's Guide">
+    <meta property="og:description" content="Learn vector math for ML using simple marketing examples. From basics to predictions in 10 lessons.">
+    <meta property="og:type" content="website">
+    
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --secondary: #2E74B5;
+            --accent: #E8F4F8;
+            --success: #E8F8E8;
+            --warning: #FFF8E7;
+            --text: #333;
+            --light-gray: #f5f5f5;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Breadcrumbs */
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a { color: var(--secondary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--accent), #fff);
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            font-style: italic;
+        }
+        
+        /* Section Headings */
+        h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            font-size: 1.3rem;
+            margin: 25px 0 15px;
+        }
+        
+        p { margin-bottom: 15px; }
+        
+        /* Callout Boxes */
+        .callout {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .callout-info { background: var(--accent); border-left: 4px solid var(--secondary); }
+        .callout-success { background: var(--success); border-left: 4px solid #28a745; }
+        .callout-warning { background: var(--warning); border-left: 4px solid #ffc107; }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* Lesson Cards */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .lesson-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 25px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .lesson-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .lesson-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+        
+        .lesson-card p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+        
+        .lesson-card a {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .lesson-card a:hover { text-decoration: underline; }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-size: 0.9rem;
+            margin-right: 10px;
+        }
+        
+        .star { color: #ffc107; }
+        
+        /* FAQ Section */
+        .faq-item {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .faq-answer {
+            color: #555;
+        }
+        
+        /* Code */
+        code {
+            background: var(--light-gray);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        /* Footer */
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .hero { padding: 40px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> &gt; <span>Vectors for Data Science</span>
+</nav>
+
+<!-- Hero Section -->
+<header class="hero">
+    <h1>Vectors for Data Science</h1>
+    <p class="subtitle">A Beginner's Guide to Vector Math for Machine Learning</p>
+    <p class="tagline">Learn through your online store — from basic math to predictions</p>
+</header>
+
+<!-- Introduction -->
+<main>
+    <section>
+        <h2>What You'll Learn</h2>
+        
+        <p>This 10-lesson course teaches you <strong>vector operations</strong> — the mathematical foundation of machine learning — using simple, real-world examples from running an online store.</p>
+        
+        <p>No prior math background needed. We start from scratch and build up to making actual predictions about customer behavior.</p>
+        
+        <div class="callout callout-info">
+            <p class="callout-title">📊 Our Learning Approach</p>
+            <p>Every concept uses the same example: <strong>"Cozy Corner Shop"</strong> — your small online store selling candles and home goods. You'll learn to predict which customers will buy after receiving a promotional email.</p>
+        </div>
+    </section>
+
+    <!-- Key Takeaways -->
+    <section>
+        <h2>Key Takeaways</h2>
+        
+        <div class="callout callout-success">
+            <p class="callout-title">✅ By the end of this course, you will:</p>
+            <ul>
+                <li>Understand what vectors are and why they matter in data science</li>
+                <li>Perform all essential vector operations (addition, subtraction, dot product, etc.)</li>
+                <li>Know how these operations power machine learning models</li>
+                <li>Write Python code using NumPy to work with vectors</li>
+                <li>Build a simple prediction model from scratch</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Course Outline -->
+    <section>
+        <h2>Course Lessons</h2>
+        
+        <div class="lessons-grid">
+            <article class="lesson-card">
+                <h3><span class="lesson-number">0</span> What Is a Vector?</h3>
+                <p>Understand vectors as ordered lists of numbers representing customer data.</p>
+                <a href="what-is-a-vector.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">1</span> Vector Addition</h3>
+                <p>Combine customer profiles and find group averages (centroids).</p>
+                <a href="vector-addition.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">2</span> Vector Subtraction</h3>
+                <p>Measure differences between customers and track changes over time.</p>
+                <a href="vector-subtraction.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">3</span> Scalar Multiplication</h3>
+                <p>Scale features and adjust their importance in calculations.</p>
+                <a href="scalar-multiplication.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">4</span> Dot Product <span class="star">⭐</span></h3>
+                <p><strong>The most important operation!</strong> Calculate prediction scores from features and weights.</p>
+                <a href="dot-product.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">5</span> Cross Product</h3>
+                <p>Find perpendicular directions in 3D (less common in tabular ML).</p>
+                <a href="cross-product.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">6</span> Line Equation</h3>
+                <p>Model trends and understand how gradient descent learns.</p>
+                <a href="line-equation.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">7</span> Plane Equation</h3>
+                <p>Create decision boundaries that separate customer groups.</p>
+                <a href="plane-equation.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">8</span> Line Intersections</h3>
+                <p>Find points satisfying multiple trend equations.</p>
+                <a href="line-intersections.html">Start Lesson →</a>
+            </article>
+            
+            <article class="lesson-card">
+                <h3><span class="lesson-number">9</span> Plane Intersections</h3>
+                <p>Solve systems of equations and constrained optimization.</p>
+                <a href="plane-intersections.html">Start Lesson →</a>
+            </article>
+        </div>
+    </section>
+
+    <!-- Prerequisites -->
+    <section>
+        <h2>Prerequisites</h2>
+        
+        <h3>What You Need</h3>
+        <ul>
+            <li><strong>Basic arithmetic:</strong> Addition, subtraction, multiplication</li>
+            <li><strong>Python basics:</strong> Variables, lists, loops (helpful but not required)</li>
+            <li><strong>Curiosity:</strong> A willingness to learn!</li>
+        </ul>
+        
+        <h3>What You DON'T Need</h3>
+        <ul>
+            <li>Prior linear algebra knowledge</li>
+            <li>Machine learning experience</li>
+            <li>Advanced math background</li>
+        </ul>
+    </section>
+
+    <!-- FAQ Section -->
+    <section>
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+            <p class="faq-question">Q: Do I need to know calculus for this course?</p>
+            <p class="faq-answer">No! We focus on linear algebra concepts that don't require calculus. The most complex operation is multiplication and addition.</p>
+        </div>
+        
+        <div class="faq-item">
+            <p class="faq-question">Q: What is a "feature vector" and why does it matter?</p>
+            <p class="faq-answer">A feature vector is simply a list of numbers describing one item (like a customer). It matters because ALL machine learning models take feature vectors as input. Understanding vectors = understanding how ML works.</p>
+        </div>
+        
+        <div class="faq-item">
+            <p class="faq-question">Q: What's the difference between "conversion" and "churn"?</p>
+            <p class="faq-answer"><strong>Conversion</strong> = when someone does what you wanted (like buying after an email). <strong>Churn</strong> = when someone leaves (stops buying, cancels subscription). Both are outcomes we predict using vectors!</p>
+        </div>
+        
+        <div class="faq-item">
+            <p class="faq-question">Q: Which lesson is most important for machine learning?</p>
+            <p class="faq-answer">Lesson 4: Dot Product is the foundation of almost every ML prediction. If you only have time for one lesson, make it that one!</p>
+        </div>
+        
+        <div class="faq-item">
+            <p class="faq-question">Q: Can I skip the cross product lesson?</p>
+            <p class="faq-answer">Yes, if you're only interested in tabular/spreadsheet data. Cross products are mainly used in 3D graphics and robotics, not typical customer analytics.</p>
+        </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section>
+        <h2>Ready to Start?</h2>
+        
+        <p>Begin with <a href="what-is-a-vector.html">Lesson 0: What Is a Vector?</a> to build your foundation, then work through each lesson in order.</p>
+        
+        <div class="callout callout-warning">
+            <p class="callout-title">💡 Pro Tip</p>
+            <p>Each lesson includes Python code snippets. Try running them yourself using <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a> (free, no installation needed) to solidify your understanding.</p>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>© 2026 Your Website Name. Built with ❤️ for data science learners.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Cross Product Explained | Vectors for Data Science - Lesson 5</title>
+    <meta name="description" content="Learn the cross product for 3D geometry. While less common in tabular ML, it's essential for computer vision and robotics applications.">
+    <meta name="keywords" content="cross product, vector product, 3D vectors, perpendicular vector, surface normal">
+    
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --secondary: #2E74B5;
+            --accent: #E8F4F8;
+            --success: #E8F8E8;
+            --warning: #FFF8E7;
+            --error: #FFF0F0;
+            --text: #333;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a { color: var(--secondary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 35px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h3 {
+            color: #444;
+            font-size: 1.2rem;
+            margin: 25px 0 10px;
+        }
+        
+        p { margin-bottom: 15px; }
+        
+        .callout {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .callout-success { background: var(--success); border-left: 4px solid #28a745; }
+        .callout-warning { background: var(--warning); border-left: 4px solid #ffc107; }
+        .callout-error { background: var(--error); border-left: 4px solid #dc3545; }
+        .callout-info { background: var(--accent); border-left: 4px solid var(--secondary); }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        :not(pre) > code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 25px;
+        }
+        
+        li { margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .nav-links a:hover { text-decoration: underline; }
+        
+        .practice-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .practice-question strong { color: var(--primary); }
+        
+        .answer {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--success);
+            border-radius: 4px;
+        }
+        
+        .resources {
+            background: var(--warning);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .resources h3 { margin-top: 0; }
+        
+        .resources a {
+            color: var(--secondary);
+            word-break: break-all;
+        }
+        
+        .try-it {
+            background: var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder p { margin: 5px 0; color: #666; }
+        .image-placeholder .prompt { font-style: italic; font-size: 0.9rem; }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> &gt; <a href="index.html">Vectors for Data Science</a> &gt; <span>Cross Product</span>
+</nav>
+
+<!-- Header -->
+<header>
+    <span class="lesson-number">Lesson 5</span>
+    <h1>Cross Product</h1>
+</header>
+
+<main>
+    <!-- A) What It Means -->
+    <section>
+        <h2>A) What It Means</h2>
+        <p>The cross product takes two vectors (in 3D) and produces a new vector that is perpendicular (at a 90° angle) to both original vectors.</p>
+    </section>
+
+    <!-- B) How to Picture It -->
+    <section>
+        <h2>B) How to Picture It</h2>
+        <p>Imagine two arrows lying on a table. The cross product gives you an arrow pointing straight UP, perpendicular to the table.</p><p></p><pre><code></p><p>        ↑ (a × b) points UP</p><p>        |</p><p>        |</p><p>    ----+----→ b</p><p>       /</p><p>      /</p><p>     ↙ a</p><pre><code></p><p></p><p>The length of a × b tells you the area of the parallelogram formed by a and b.</p>
+        
+        <!-- Image Placeholder 1 -->
+        <div class="image-placeholder" role="img" aria-label="Smartphone displaying 3D orientation axes from sensors">
+            <p><strong>📷 Image: Your phone uses cross products to know which way is 'up'</strong></p>
+            <p class="prompt">Realistic prompt: "A smartphone showing orientation sensors with 3D arrows indicating x, y, z axes and rotation"</p>
+            <p><em>Alt text: Smartphone displaying 3D orientation axes from sensors</em></p>
+        </div>
+    </section>
+
+    <!-- C) Business Example -->
+    <section>
+        <h2>C) Business Example</h2>
+        <p><strong>Note: Cross products are mostly used in 3D geometry, not typical customer spreadsheets.</strong></p><p></p><p><strong>Where you might see it:</strong></p><p></p><p>- </strong>Phone orientation:<strong> Your phone knows which way is "up" using cross products of sensor readings</p><p>- </strong>3D product visualization:<strong> If your online store shows 3D models customers can rotate</p><p>- </strong>Geospatial analysis:** Delivery routes on Earth's surface (a 3D sphere)</p>
+    </section>
+
+    <!-- D) Where It Shows Up in ML -->
+    <section>
+        <h2>D) Where It Shows Up in ML</h2>
+        <p><strong>Plain words:</strong> For typical tabular/spreadsheet data (customers with features like age, income), you almost never use cross products. The dot product is your workhorse.</p><p></p><p><strong>However,</strong> cross products show up in:</p><p>- Computer vision (3D object detection)</p><p>- Robotics (arm movements, drone navigation)  </p><p>- Physics simulations (games, VR)</p><p></p><p><strong>In machine learning for 3D data, this might be called "surface normal calculation."</strong></p>
+        
+        <!-- Image Placeholder 2 -->
+        <div class="image-placeholder" role="img" aria-label="Cross product creating perpendicular vector diagram">
+            <p><strong>📊 Infographic: Cross product: find the direction perpendicular to two vectors</strong></p>
+            <p class="prompt">Infographic prompt: "Two flat arrows on a plane with a third arrow pointing perpendicular, labeled with the cross product formula"</p>
+            <p><em>Alt text: Cross product creating perpendicular vector diagram</em></p>
+        </div>
+    </section>
+
+    <!-- E) Worked Example -->
+    <section>
+        <h2>E) Worked Numeric Example</h2>
+        <p></code></pre><p>a = [1, 0, 0]  (pointing "right")</p><p>b = [0, 1, 0]  (pointing "forward")</p><p></p><p>Cross product formula:</p><p>a × b = [a₂b₃ - a₃b₂, a₃b₁ - a₁b₃, a₁b₂ - a₂b₁]</p><p>      = [(0×0 - 0×1), (0×0 - 1×0), (1×1 - 0×0)]</p><p>      = [0, 0, 1]</p><pre><code></p><p></p><p>Result: [0, 0, 1] points "up" — perpendicular to both!</p>
+    </section>
+
+    <!-- F) Python Code -->
+    <section>
+        <h2>F) Python (NumPy) Snippet</h2>
+        <pre><code>import numpy as np
+
+a = np.array([1, 0, 0])  # right
+b = np.array([0, 1, 0])  # forward
+
+# Cross product
+c = np.cross(a, b)
+print("a × b =", c)
+
+# Verify it's perpendicular (dot products should be 0)
+print("c · a =", np.dot(c, a))
+print("c · b =", np.dot(c, b))
+
+# Output:
+# a × b = [0 0 1]
+# c · a = 0
+# c · b = 0</code></pre>
+        
+        <div class="try-it">
+            <h3>🧪 Try It Yourself</h3>
+            <p>Run this code in <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a> (free, no installation):</p>
+            <ol>
+                <li>Go to colab.research.google.com</li>
+                <li>Click "New Notebook"</li>
+                <li>Paste the code above into a cell</li>
+                <li>Press Shift+Enter to run</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- G) Key Takeaways -->
+    <section>
+        <h2>G) Key Takeaways</h2>
+        <div class="callout callout-success">
+            <p class="callout-title">✅ What to Remember</p>
+            <ul>
+                <li>Cross product is for 3D vectors only</li>
+                <li>Result is a new vector, perpendicular to both inputs</li>
+                <li>Rare in spreadsheet ML, common in graphics/physics/robotics</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- H) Common Mistakes -->
+    <section>
+        <h2>H) Common Mistakes</h2>
+        <div class="callout callout-error">
+            <p class="callout-title">❌ Avoid These Errors</p>
+            <ul>
+                <li>Trying to use cross product on non-3D data (it doesn't work!)</li>
+                <li>Confusing cross product (gives vector) with dot product (gives number)</li>
+                <li>Order matters! a × b = -(b × a) — they point opposite directions</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Practice Questions -->
+    <section>
+        <h2>📝 Practice Questions</h2>
+        
+        
+        <div class="practice-question">
+            <p><strong>Question 1:</strong> What type of result does a cross product give: a number or a vector?</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">A vector (perpendicular to both inputs)</div>
+            </details>
+        </div>
+        
+        <div class="practice-question">
+            <p><strong>Question 2:</strong> Can you compute the cross product of [1, 2] and [3, 4]?</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">No! Cross product only works for 3D vectors.</div>
+            </details>
+        </div>
+        
+    </section>
+
+    <!-- Resources -->
+    <section class="resources">
+        <h3>📚 Learning Resources</h3>
+        
+        <p><strong>🎬 Video:</strong> 3Blue1Brown: Cross products<br>
+        <a href="https://youtube.com/watch?v=eu6i7WJeinw" target="_blank" rel="noopener">https://youtube.com/watch?v=eu6i7WJeinw</a></p>
+        
+        <p><strong>✏️ Practice:</strong> Khan Academy: Cross product exercises<br>
+        <a href="https://khanacademy.org/math/linear-algebra/vectors-and-spaces/dot-cross-products" target="_blank" rel="noopener">https://khanacademy.org/math/linear-algebra/vectors-and-spaces/dot-cross-products</a></p>
+        
+        <p><strong>🤖 Applied ML:</strong> PyTorch3D Documentation<br>
+        <a href="https://pytorch3d.org/docs/cameras" target="_blank" rel="noopener">https://pytorch3d.org/docs/cameras</a></p>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-links" aria-label="Lesson navigation">
+        <a href="dot-product.html">← Dot Product</a>
+        <a href="line-equation.html">Line Equation →</a>
+    </nav>
+</main>
+
+<footer>
+    <p><a href="index.html">← Back to Course Home</a></p>
+    <p>© 2026 Your Website Name</p>
+</footer>
+
+</body>
+</html>

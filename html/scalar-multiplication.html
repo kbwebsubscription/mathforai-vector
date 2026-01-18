@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Scalar Multiplication Explained | Vectors for Data Science - Lesson 3</title>
+    <meta name="description" content="Learn how to multiply vectors by scalars to scale features and adjust importance. Essential for feature normalization in ML.">
+    <meta name="keywords" content="scalar multiplication, vector scaling, feature normalization, standardization, weight vectors">
+    
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --secondary: #2E74B5;
+            --accent: #E8F4F8;
+            --success: #E8F8E8;
+            --warning: #FFF8E7;
+            --error: #FFF0F0;
+            --text: #333;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a { color: var(--secondary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 35px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h3 {
+            color: #444;
+            font-size: 1.2rem;
+            margin: 25px 0 10px;
+        }
+        
+        p { margin-bottom: 15px; }
+        
+        .callout {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .callout-success { background: var(--success); border-left: 4px solid #28a745; }
+        .callout-warning { background: var(--warning); border-left: 4px solid #ffc107; }
+        .callout-error { background: var(--error); border-left: 4px solid #dc3545; }
+        .callout-info { background: var(--accent); border-left: 4px solid var(--secondary); }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        :not(pre) > code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 25px;
+        }
+        
+        li { margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .nav-links a:hover { text-decoration: underline; }
+        
+        .practice-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .practice-question strong { color: var(--primary); }
+        
+        .answer {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--success);
+            border-radius: 4px;
+        }
+        
+        .resources {
+            background: var(--warning);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .resources h3 { margin-top: 0; }
+        
+        .resources a {
+            color: var(--secondary);
+            word-break: break-all;
+        }
+        
+        .try-it {
+            background: var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder p { margin: 5px 0; color: #666; }
+        .image-placeholder .prompt { font-style: italic; font-size: 0.9rem; }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> &gt; <a href="index.html">Vectors for Data Science</a> &gt; <span>Scalar Multiplication</span>
+</nav>
+
+<!-- Header -->
+<header>
+    <span class="lesson-number">Lesson 3</span>
+    <h1>Scalar Multiplication</h1>
+</header>
+
+<main>
+    <!-- A) What It Means -->
+    <section>
+        <h2>A) What It Means</h2>
+        <p>Scalar multiplication means multiplying every number in a vector by a single number (the 'scalar'). It stretches or shrinks the vector.</p>
+    </section>
+
+    <!-- B) How to Picture It -->
+    <section>
+        <h2>B) How to Picture It</h2>
+        <p>A scalar is just a regular number (not a list). Multiplying stretches or shrinks:</p><p></p><pre><code></p><p>Original:     •---→  (length 1)</p><p>Times 2:      •--------→  (length 2)</p><p>Times 0.5:    •-→  (length 0.5)</p><p>Times -1:     ←---•  (flipped!)</p><pre><code></p>
+        
+        <!-- Image Placeholder 1 -->
+        <div class="image-placeholder" role="img" aria-label="Rubber band stretched to show vector scaling concept">
+            <p><strong>📷 Image: Scalar multiplication stretches or shrinks vectors</strong></p>
+            <p class="prompt">Realistic prompt: "A rubber band being stretched, representing vector scaling, with measurement marks showing 1x, 2x, 3x lengths"</p>
+            <p><em>Alt text: Rubber band stretched to show vector scaling concept</em></p>
+        </div>
+    </section>
+
+    <!-- C) Business Example -->
+    <section>
+        <h2>C) Business Example</h2>
+        <p><strong>Situation:</strong> Adjusting how much each feature "counts" when comparing customers.</p><p></p><p>Income is in thousands (45), but visits are small (5). To make them comparable:</p><p></p><pre><code></p><p>Original: [age, income_k, visits] = [28, 45, 5]</p><p>Scale visits by 10: [28, 45, 50]</p><pre><code></p><p></p><p>Now visits "counts" roughly the same as income in distance calculations.</p>
+    </section>
+
+    <!-- D) Where It Shows Up in ML -->
+    <section>
+        <h2>D) Where It Shows Up in ML</h2>
+        <p><strong>Plain words:</strong> In many formulas, you multiply features by "importance weights." Each weight is a scalar that says "this feature matters this much."</p><p></p><p><strong>In machine learning, this is called "weighting."</strong> Also, feature scaling (making all numbers a similar size) uses scalar multiplication. Common methods: normalization (0-1 range) and standardization (mean=0, std=1).</p>
+        
+        <!-- Image Placeholder 2 -->
+        <div class="image-placeholder" role="img" aria-label="Bar chart comparing original and scaled feature values">
+            <p><strong>📊 Infographic: Scaling puts different features on comparable scales</strong></p>
+            <p class="prompt">Infographic prompt: "Bar chart showing original features vs. scaled features, with some bars growing and others shrinking"</p>
+            <p><em>Alt text: Bar chart comparing original and scaled feature values</em></p>
+        </div>
+    </section>
+
+    <!-- E) Worked Example -->
+    <section>
+        <h2>E) Worked Numeric Example</h2>
+        <p>Scale the entire vector by 2:</p><p></p><pre><code></p><p>x = [28, 45, 5, 8]</p><p></p><p>2 × x = [2×28, 2×45, 2×5, 2×8]</p><p>      = [56, 90, 10, 16]</p><pre><code></p>
+    </section>
+
+    <!-- F) Python Code -->
+    <section>
+        <h2>F) Python (NumPy) Snippet</h2>
+        <pre><code>import numpy as np
+
+alice = np.array([28, 45, 5, 8])
+
+# Scale entire vector by 2
+scaled_all = 2 * alice
+print("All scaled by 2:", scaled_all)
+
+# Scale just one feature (visits at index 2) by 10
+alice_adjusted = alice.copy()
+alice_adjusted[2] = alice[2] * 10
+print("Visits scaled by 10:", alice_adjusted)
+
+# Output:
+# All scaled by 2: [56 90 10 16]
+# Visits scaled by 10: [28 45 50  8]</code></pre>
+        
+        <div class="try-it">
+            <h3>🧪 Try It Yourself</h3>
+            <p>Run this code in <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a> (free, no installation):</p>
+            <ol>
+                <li>Go to colab.research.google.com</li>
+                <li>Click "New Notebook"</li>
+                <li>Paste the code above into a cell</li>
+                <li>Press Shift+Enter to run</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- G) Key Takeaways -->
+    <section>
+        <h2>G) Key Takeaways</h2>
+        <div class="callout callout-success">
+            <p class="callout-title">✅ What to Remember</p>
+            <ul>
+                <li>Scalar = single number multiplied with every element</li>
+                <li>Scaling makes features comparable or adjusts their importance</li>
+                <li>Multiplying by a negative flips the direction</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- H) Common Mistakes -->
+    <section>
+        <h2>H) Common Mistakes</h2>
+        <div class="callout callout-error">
+            <p class="callout-title">❌ Avoid These Errors</p>
+            <ul>
+                <li>Confusing scalar multiplication with dot product (scalar mult → vector; dot product → number)</li>
+                <li>Forgetting that scaling changes the 'meaning' of your numbers (document it!)</li>
+                <li>Scaling by zero (you lose all information!)</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Practice Questions -->
+    <section>
+        <h2>📝 Practice Questions</h2>
+        
+        
+        <div class="practice-question">
+            <p><strong>Question 1:</strong> Multiply: 3 × [10, 20, 5]</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">[30, 60, 15]</div>
+            </details>
+        </div>
+        
+        <div class="practice-question">
+            <p><strong>Question 2:</strong> What does multiplying a vector by -1 do?</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">It reverses (flips) the direction of the vector.</div>
+            </details>
+        </div>
+        
+    </section>
+
+    <!-- Resources -->
+    <section class="resources">
+        <h3>📚 Learning Resources</h3>
+        
+        <p><strong>🎬 Video:</strong> 3Blue1Brown: Linear transformations<br>
+        <a href="https://youtube.com/watch?v=kYB8IZa5AuE" target="_blank" rel="noopener">https://youtube.com/watch?v=kYB8IZa5AuE</a></p>
+        
+        <p><strong>✏️ Practice:</strong> Khan Academy: Scalar multiplication<br>
+        <a href="https://khanacademy.org/math/linear-algebra/vectors-and-spaces/vectors" target="_blank" rel="noopener">https://khanacademy.org/math/linear-algebra/vectors-and-spaces/vectors</a></p>
+        
+        <p><strong>🤖 Applied ML:</strong> Scikit-learn: Preprocessing (StandardScaler)<br>
+        <a href="https://scikit-learn.org/stable/modules/preprocessing.html" target="_blank" rel="noopener">https://scikit-learn.org/stable/modules/preprocessing.html</a></p>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-links" aria-label="Lesson navigation">
+        <a href="vector-subtraction.html">← Vector Subtraction</a>
+        <a href="dot-product.html">Dot Product →</a>
+    </nav>
+</main>
+
+<footer>
+    <p><a href="index.html">← Back to Course Home</a></p>
+    <p>© 2026 Your Website Name</p>
+</footer>
+
+</body>
+</html>

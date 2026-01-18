@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Plane Equation & Decision Boundaries | Vectors for ML - Lesson 7</title>
+    <meta name="description" content="Learn how plane equations create decision boundaries that separate customer groups. Essential for classification in machine learning.">
+    <meta name="keywords" content="plane equation, decision boundary, classification, linear classifier, hyperplane, SVM">
+    
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --secondary: #2E74B5;
+            --accent: #E8F4F8;
+            --success: #E8F8E8;
+            --warning: #FFF8E7;
+            --error: #FFF0F0;
+            --text: #333;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a { color: var(--secondary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 35px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h3 {
+            color: #444;
+            font-size: 1.2rem;
+            margin: 25px 0 10px;
+        }
+        
+        p { margin-bottom: 15px; }
+        
+        .callout {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .callout-success { background: var(--success); border-left: 4px solid #28a745; }
+        .callout-warning { background: var(--warning); border-left: 4px solid #ffc107; }
+        .callout-error { background: var(--error); border-left: 4px solid #dc3545; }
+        .callout-info { background: var(--accent); border-left: 4px solid var(--secondary); }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        :not(pre) > code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 25px;
+        }
+        
+        li { margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .nav-links a:hover { text-decoration: underline; }
+        
+        .practice-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .practice-question strong { color: var(--primary); }
+        
+        .answer {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--success);
+            border-radius: 4px;
+        }
+        
+        .resources {
+            background: var(--warning);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .resources h3 { margin-top: 0; }
+        
+        .resources a {
+            color: var(--secondary);
+            word-break: break-all;
+        }
+        
+        .try-it {
+            background: var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder p { margin: 5px 0; color: #666; }
+        .image-placeholder .prompt { font-style: italic; font-size: 0.9rem; }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> &gt; <a href="index.html">Vectors for Data Science</a> &gt; <span>Equation of a Plane</span>
+</nav>
+
+<!-- Header -->
+<header>
+    <span class="lesson-number">Lesson 7</span>
+    <h1>Equation of a Plane</h1>
+</header>
+
+<main>
+    <!-- A) What It Means -->
+    <section>
+        <h2>A) What It Means</h2>
+        <p>A plane is a flat surface that extends forever. In 3D, it's like an infinite sheet of paper. In math, it's defined by: w · x = b</p>
+    </section>
+
+    <!-- B) How to Picture It -->
+    <section>
+        <h2>B) How to Picture It</h2>
+        <p>Imagine a wall. The plane is the wall surface. The normal vector w is an arrow pointing straight OUT from the wall (perpendicular to it).</p><p></p><pre><code></p><p>          ↑ normal (w)</p><p>          |</p><p>    ------+------</p><p>   /      |      \</p><p>  /   the plane   \</p><p> /   (the wall)    \</p><pre><code></p>
+        
+        <!-- Image Placeholder 1 -->
+        <div class="image-placeholder" role="img" aria-label="Glass wall separating buyers from non-buyers">
+            <p><strong>📷 Image: A decision boundary separates two groups of customers</strong></p>
+            <p class="prompt">Realistic prompt: "A glass wall dividing a room with people on both sides, some with shopping bags (buyers) and some without"</p>
+            <p><em>Alt text: Glass wall separating buyers from non-buyers</em></p>
+        </div>
+    </section>
+
+    <!-- C) Business Example -->
+    <section>
+        <h2>C) Business Example</h2>
+        <p><strong>Situation:</strong> A rule that separates "likely buyers" from "unlikely buyers."</p><p></p><pre><code></p><p>Rule: 0.5 × visits + 1.0 × satisfaction = 10</p><p></p><p>Carol: visits=8, satisfaction=9</p><p>Score = 0.5(8) + 1.0(9) = 13</p><p>13 > 10 → Carol is on the "likely to buy" side ✓</p><p></p><p>Bob: visits=1, satisfaction=5</p><p>Score = 0.5(1) + 1.0(5) = 5.5</p><p>5.5 < 10 → Bob is on the "unlikely" side ✗</p><pre><code></p>
+    </section>
+
+    <!-- D) Where It Shows Up in ML -->
+    <section>
+        <h2>D) Where It Shows Up in ML</h2>
+        <p><strong>Plain words:</strong> Many classification models work by finding a plane (or line in 2D) that separates two groups. Customers on one side get one label ("will buy"), customers on the other side get the opposite ("won't buy").</p><p></p><p><strong>In machine learning, this is called a "decision boundary."</strong></p><p></p><p>The model classifies by checking:</p><p>- If w · x > b → predict "yes"</p><p>- If w · x < b → predict "no"</p><p></p><p>Logistic regression and SVMs find the best plane to separate your data.</p>
+        
+        <!-- Image Placeholder 2 -->
+        <div class="image-placeholder" role="img" aria-label="Scatter plot with decision boundary line separating classes">
+            <p><strong>📊 Infographic: The plane equation defines the dividing line between groups</strong></p>
+            <p class="prompt">Infographic prompt: "2D scatter plot with dots in two colors separated by a diagonal line, labeled 'will buy' and 'won't buy'"</p>
+            <p><em>Alt text: Scatter plot with decision boundary line separating classes</em></p>
+        </div>
+    </section>
+
+    <!-- E) Worked Example -->
+    <section>
+        <h2>E) Worked Numeric Example</h2>
+        <p>Decision boundary: 0.5 × visits + 1.0 × satisfaction = 10</p><p></p><pre><code></p><p>Carol: [visits=8, satisfaction=9]</p><p>Score = 0.5(8) + 1.0(9) = 4 + 9 = 13</p><p>13 > 10 → Likely buyer ✓</p><p></p><p>Bob: [visits=1, satisfaction=5]  </p><p>Score = 0.5(1) + 1.0(5) = 0.5 + 5 = 5.5</p><p>5.5 < 10 → Unlikely buyer ✗</p><pre><code></p>
+    </section>
+
+    <!-- F) Python Code -->
+    <section>
+        <h2>F) Python (NumPy) Snippet</h2>
+        <pre><code>import numpy as np
+
+# Decision boundary: w · x = b
+w = np.array([0.5, 1.0])  # weights for [visits, satisfaction]
+b = 10                     # threshold
+
+# Check customers
+carol = np.array([8, 9])
+bob = np.array([1, 5])
+
+carol_score = np.dot(w, carol)
+bob_score = np.dot(w, bob)
+
+print(f"Carol: score = {carol_score}, prediction = {'Buy' if carol_score >= b else 'No buy'}")
+print(f"Bob: score = {bob_score}, prediction = {'Buy' if bob_score >= b else 'No buy'}")
+
+# Output:
+# Carol: score = 13.0, prediction = Buy
+# Bob: score = 5.5, prediction = No buy</code></pre>
+        
+        <div class="try-it">
+            <h3>🧪 Try It Yourself</h3>
+            <p>Run this code in <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a> (free, no installation):</p>
+            <ol>
+                <li>Go to colab.research.google.com</li>
+                <li>Click "New Notebook"</li>
+                <li>Paste the code above into a cell</li>
+                <li>Press Shift+Enter to run</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- G) Key Takeaways -->
+    <section>
+        <h2>G) Key Takeaways</h2>
+        <div class="callout callout-success">
+            <p class="callout-title">✅ What to Remember</p>
+            <ul>
+                <li>A plane is defined by w · x = b</li>
+                <li>It divides space into two halves (two groups)</li>
+                <li>Decision boundaries in classification are often planes</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- H) Common Mistakes -->
+    <section>
+        <h2>H) Common Mistakes</h2>
+        <div class="callout callout-error">
+            <p class="callout-title">❌ Avoid These Errors</p>
+            <ul>
+                <li>Forgetting that in 2D, a 'plane' looks like a line</li>
+                <li>Confusing the normal vector w with points on the plane</li>
+                <li>Thinking all ML uses linear planes (many models use curved boundaries!)</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Practice Questions -->
+    <section>
+        <h2>📝 Practice Questions</h2>
+        
+        
+        <div class="practice-question">
+            <p><strong>Question 1:</strong> For decision boundary 2x + 3y = 12, classify point (3, 2)</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">Score = 2(3) + 3(2) = 12. Exactly on boundary! Could go either way.</div>
+            </details>
+        </div>
+        
+        <div class="practice-question">
+            <p><strong>Question 2:</strong> If w · x > b predicts 'yes', what does w · x < b predict?</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">'No' - the customer is on the opposite side of the decision boundary</div>
+            </details>
+        </div>
+        
+    </section>
+
+    <!-- Resources -->
+    <section class="resources">
+        <h3>📚 Learning Resources</h3>
+        
+        <p><strong>🎬 Video:</strong> StatQuest: Logistic Regression<br>
+        <a href="https://youtube.com/watch?v=yIYKR4sgzI8" target="_blank" rel="noopener">https://youtube.com/watch?v=yIYKR4sgzI8</a></p>
+        
+        <p><strong>✏️ Practice:</strong> Khan Academy: Equations of planes<br>
+        <a href="https://khanacademy.org/math/multivariable-calculus" target="_blank" rel="noopener">https://khanacademy.org/math/multivariable-calculus</a></p>
+        
+        <p><strong>🤖 Applied ML:</strong> Scikit-learn: Support Vector Machines<br>
+        <a href="https://scikit-learn.org/stable/modules/svm.html" target="_blank" rel="noopener">https://scikit-learn.org/stable/modules/svm.html</a></p>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-links" aria-label="Lesson navigation">
+        <a href="line-equation.html">← Line Equation</a>
+        <a href="line-intersections.html">Line Intersections →</a>
+    </nav>
+</main>
+
+<footer>
+    <p><a href="index.html">← Back to Course Home</a></p>
+    <p>© 2026 Your Website Name</p>
+</footer>
+
+</body>
+</html>

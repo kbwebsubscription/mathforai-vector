@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Plane Intersections | Constrained Optimization in ML - Lesson 9</title>
+    <meta name="description" content="Learn how plane intersections relate to solving Ax=b and constrained optimization - fundamental concepts in machine learning.">
+    <meta name="keywords" content="plane intersection, Ax=b, constrained optimization, linear algebra, feasible region, numpy linalg solve">
+    
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --secondary: #2E74B5;
+            --accent: #E8F4F8;
+            --success: #E8F8E8;
+            --warning: #FFF8E7;
+            --error: #FFF0F0;
+            --text: #333;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a { color: var(--secondary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 35px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h3 {
+            color: #444;
+            font-size: 1.2rem;
+            margin: 25px 0 10px;
+        }
+        
+        p { margin-bottom: 15px; }
+        
+        .callout {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .callout-success { background: var(--success); border-left: 4px solid #28a745; }
+        .callout-warning { background: var(--warning); border-left: 4px solid #ffc107; }
+        .callout-error { background: var(--error); border-left: 4px solid #dc3545; }
+        .callout-info { background: var(--accent); border-left: 4px solid var(--secondary); }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        :not(pre) > code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 25px;
+        }
+        
+        li { margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .nav-links a:hover { text-decoration: underline; }
+        
+        .practice-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .practice-question strong { color: var(--primary); }
+        
+        .answer {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--success);
+            border-radius: 4px;
+        }
+        
+        .resources {
+            background: var(--warning);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .resources h3 { margin-top: 0; }
+        
+        .resources a {
+            color: var(--secondary);
+            word-break: break-all;
+        }
+        
+        .try-it {
+            background: var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder p { margin: 5px 0; color: #666; }
+        .image-placeholder .prompt { font-style: italic; font-size: 0.9rem; }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> &gt; <a href="index.html">Vectors for Data Science</a> &gt; <span>Intersection of Planes</span>
+</nav>
+
+<!-- Header -->
+<header>
+    <span class="lesson-number">Lesson 9</span>
+    <h1>Intersection of Planes</h1>
+</header>
+
+<main>
+    <!-- A) What It Means -->
+    <section>
+        <h2>A) What It Means</h2>
+        <p>Intersection of planes means finding points that lie on two (or more) planes at the same time.</p>
+    </section>
+
+    <!-- B) How to Picture It -->
+    <section>
+        <h2>B) How to Picture It</h2>
+        <p>- Two planes typically intersect in a **line**</p><p>- Three planes typically intersect at a **single point**</p><p>- Planes can also be parallel (never touch) or identical</p><p></p><pre><code></p><p>Two walls meeting → corner line</p><p>Three walls meeting → corner point (like a room corner)</p><pre><code></p>
+        
+        <!-- Image Placeholder 1 -->
+        <div class="image-placeholder" role="img" aria-label="Room corner showing three planes meeting at a point">
+            <p><strong>📷 Image: Three planes meeting at a point - like the corner of a room</strong></p>
+            <p class="prompt">Realistic prompt: "Corner of a room where two walls and the floor meet, with a small dot marking the intersection point"</p>
+            <p><em>Alt text: Room corner showing three planes meeting at a point</em></p>
+        </div>
+    </section>
+
+    <!-- C) Business Example -->
+    <section>
+        <h2>C) Business Example</h2>
+        <p><strong>Situation:</strong> Finding customers who satisfy multiple decision rules.</p><p></p><pre><code></p><p>Rule 1 (Budget):      income - 20×purchases ≥ 10  (can afford more)</p><p>Rule 2 (Engagement):  visits + emails_opened ≥ 8  (actively engaged)</p><p>Rule 3 (Satisfaction): satisfaction ≥ 6           (happy with us)</p><pre><code></p><p></p><p>Each rule defines a plane (actually a half-space). The intersection of all three gives you the "sweet spot" — customers who satisfy ALL criteria.</p><p></p><p>These are your <strong>ideal targets</strong> for a marketing campaign!</p>
+    </section>
+
+    <!-- D) Where It Shows Up in ML -->
+    <section>
+        <h2>D) Where It Shows Up in ML</h2>
+        <p><strong>Plain words:</strong> Many real problems have multiple constraints or rules. Finding the intersection means finding solutions that satisfy all of them.</p><p></p><p><strong>In machine learning, this is called "constrained optimization"</strong> or solving a "system of linear equations" (Ax = b).</p><p></p><p>The tool `numpy.linalg.solve()` finds the intersection of n planes (equations) in n-dimensional space. This is used everywhere:</p><p>- Finding optimal model weights</p><p>- Linear programming (business optimization)</p><p>- Solving the "normal equations" in linear regression</p>
+        
+        <!-- Image Placeholder 2 -->
+        <div class="image-placeholder" role="img" aria-label="Three planes intersecting at a single solution point">
+            <p><strong>📊 Infographic: Finding the solution that satisfies all constraints</strong></p>
+            <p class="prompt">Infographic prompt: "3D visualization showing three colored planes intersecting at one point, with the point highlighted"</p>
+            <p><em>Alt text: Three planes intersecting at a single solution point</em></p>
+        </div>
+    </section>
+
+    <!-- E) Worked Example -->
+    <section>
+        <h2>E) Worked Numeric Example</h2>
+        <p>Find the intersection of these two planes (in 2D, so they're lines):</p><p></p><pre><code></p><p>Plane 1: 2x + 1y = 8</p><p>Plane 2: 1x + 3y = 9</p><p></p><p>Matrix form:</p><p>[2  1] [x]   [8]</p><p>[1  3] [y] = [9]</p><p></p><p>Solving (substitution):</p><p>From eq 1: y = 8 - 2x</p><p>Substitute: x + 3(8 - 2x) = 9</p><p>           x + 24 - 6x = 9</p><p>           -5x = -15</p><p>           x = 3</p><p></p><p>Then: y = 8 - 2(3) = 2</p><p></p><p>Intersection: (3, 2)</p><pre><code></p>
+    </section>
+
+    <!-- F) Python Code -->
+    <section>
+        <h2>F) Python (NumPy) Snippet</h2>
+        <pre><code>import numpy as np
+
+# Two planes (as a system of equations)
+# 2x + 1y = 8
+# 1x + 3y = 9
+
+A = np.array([
+    [2, 1],
+    [1, 3]
+])
+
+b = np.array([8, 9])
+
+# Solve for intersection
+solution = np.linalg.solve(A, b)
+print(f"Intersection point: x = {solution[0]}, y = {solution[1]}")
+
+# Verify
+print(f"Check eq 1: 2({solution[0]}) + 1({solution[1]}) = {2*solution[0] + 1*solution[1]}")
+print(f"Check eq 2: 1({solution[0]}) + 3({solution[1]}) = {1*solution[0] + 3*solution[1]}")
+
+# Output:
+# Intersection point: x = 3.0, y = 2.0
+# Check eq 1: 2(3.0) + 1(2.0) = 8.0
+# Check eq 2: 1(3.0) + 3(2.0) = 9.0</code></pre>
+        
+        <div class="try-it">
+            <h3>🧪 Try It Yourself</h3>
+            <p>Run this code in <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a> (free, no installation):</p>
+            <ol>
+                <li>Go to colab.research.google.com</li>
+                <li>Click "New Notebook"</li>
+                <li>Paste the code above into a cell</li>
+                <li>Press Shift+Enter to run</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- G) Key Takeaways -->
+    <section>
+        <h2>G) Key Takeaways</h2>
+        <div class="callout callout-success">
+            <p class="callout-title">✅ What to Remember</p>
+            <ul>
+                <li>Two planes usually meet in a line; three planes usually meet at a point</li>
+                <li>This is how you solve systems of equations (Ax = b)</li>
+                <li>Constrained optimization = finding intersections of many rules</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- H) Common Mistakes -->
+    <section>
+        <h2>H) Common Mistakes</h2>
+        <div class="callout callout-error">
+            <p class="callout-title">❌ Avoid These Errors</p>
+            <ul>
+                <li>Forgetting that planes might be parallel (no intersection exists)</li>
+                <li>Not checking for 'degenerate' cases (infinite solutions or no solution)</li>
+                <li>Confusing 'intersection point' with 'just any point on a plane'</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Practice Questions -->
+    <section>
+        <h2>📝 Practice Questions</h2>
+        
+        
+        <div class="practice-question">
+            <p><strong>Question 1:</strong> Solve: x + y = 5 and 2x - y = 1</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">Add equations: 3x = 6, so x = 2, y = 3. Intersection: (2, 3)</div>
+            </details>
+        </div>
+        
+        <div class="practice-question">
+            <p><strong>Question 2:</strong> What does numpy.linalg.solve(A, b) compute?</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">The point x where A @ x = b — the intersection of all planes defined by the rows of A</div>
+            </details>
+        </div>
+        
+    </section>
+
+    <!-- Resources -->
+    <section class="resources">
+        <h3>📚 Learning Resources</h3>
+        
+        <p><strong>🎬 Video:</strong> 3Blue1Brown: Inverse matrices, column space<br>
+        <a href="https://youtube.com/watch?v=uQhTuRlWMxw" target="_blank" rel="noopener">https://youtube.com/watch?v=uQhTuRlWMxw</a></p>
+        
+        <p><strong>✏️ Practice:</strong> Khan Academy: Solving systems with matrices<br>
+        <a href="https://khanacademy.org/math/algebra-home/alg-matrices" target="_blank" rel="noopener">https://khanacademy.org/math/algebra-home/alg-matrices</a></p>
+        
+        <p><strong>🤖 Applied ML:</strong> Coursera: Andrew Ng's ML Course<br>
+        <a href="https://coursera.org/learn/machine-learning" target="_blank" rel="noopener">https://coursera.org/learn/machine-learning</a></p>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-links" aria-label="Lesson navigation">
+        <a href="line-intersections.html">← Line Intersections</a>
+        <span></span>
+    </nav>
+</main>
+
+<footer>
+    <p><a href="index.html">← Back to Course Home</a></p>
+    <p>© 2026 Your Website Name</p>
+</footer>
+
+</body>
+</html>

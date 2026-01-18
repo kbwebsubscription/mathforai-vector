@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Vector Line Equation | Understanding Gradient Descent - Lesson 6</title>
+    <meta name="description" content="Learn the vector equation of a line and how it connects to gradient descent - the algorithm that trains machine learning models.">
+    <meta name="keywords" content="vector equation line, parametric line, gradient descent, optimization, learning rate">
+    
+    <style>
+        :root {
+            --primary: #1F4E79;
+            --secondary: #2E74B5;
+            --accent: #E8F4F8;
+            --success: #E8F8E8;
+            --warning: #FFF8E7;
+            --error: #FFF0F0;
+            --text: #333;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .breadcrumbs {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a { color: var(--secondary); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 35px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h3 {
+            color: #444;
+            font-size: 1.2rem;
+            margin: 25px 0 10px;
+        }
+        
+        p { margin-bottom: 15px; }
+        
+        .callout {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .callout-success { background: var(--success); border-left: 4px solid #28a745; }
+        .callout-warning { background: var(--warning); border-left: 4px solid #ffc107; }
+        .callout-error { background: var(--error); border-left: 4px solid #dc3545; }
+        .callout-info { background: var(--accent); border-left: 4px solid var(--secondary); }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        :not(pre) > code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 25px;
+        }
+        
+        li { margin-bottom: 8px; }
+        
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .nav-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .nav-links a:hover { text-decoration: underline; }
+        
+        .practice-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .practice-question strong { color: var(--primary); }
+        
+        .answer {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--success);
+            border-radius: 4px;
+        }
+        
+        .resources {
+            background: var(--warning);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .resources h3 { margin-top: 0; }
+        
+        .resources a {
+            color: var(--secondary);
+            word-break: break-all;
+        }
+        
+        .try-it {
+            background: var(--accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder p { margin: 5px 0; color: #666; }
+        .image-placeholder .prompt { font-style: italic; font-size: 0.9rem; }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Breadcrumbs -->
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> &gt; <a href="index.html">Vectors for Data Science</a> &gt; <span>Vector Equation of a Line</span>
+</nav>
+
+<!-- Header -->
+<header>
+    <span class="lesson-number">Lesson 6</span>
+    <h1>Vector Equation of a Line</h1>
+</header>
+
+<main>
+    <!-- A) What It Means -->
+    <section>
+        <h2>A) What It Means</h2>
+        <p>A line in vector form describes all points you can reach by starting somewhere and moving in a specific direction.</p>
+    </section>
+
+    <!-- B) How to Picture It -->
+    <section>
+        <h2>B) How to Picture It</h2>
+        <p>**Formula:** point = start + t × direction</p><p></p><p>Where t is any number. As t changes, you trace out the line.</p><p></p><pre><code></p><p>t = -1      t = 0       t = 1       t = 2</p><p>  •-----------•-----------•-----------•→</p><p>            start       (one step)   (two steps)</p><pre><code></p><p></p><p>Think of a hiking trail. The "start" is where you are. The "direction" is which way the trail goes.</p>
+        
+        <!-- Image Placeholder 1 -->
+        <div class="image-placeholder" role="img" aria-label="Hiking trail with distance markers showing linear progression">
+            <p><strong>📷 Image: Walking along a trail = moving along a line with parameter t</strong></p>
+            <p class="prompt">Realistic prompt: "A hiking trail through a forest with distance markers, representing moving along a line direction"</p>
+            <p><em>Alt text: Hiking trail with distance markers showing linear progression</em></p>
+        </div>
+    </section>
+
+    <!-- C) Business Example -->
+    <section>
+        <h2>C) Business Example</h2>
+        <p><strong>Situation:</strong> Predicting how Alice might change over time.</p><p></p><pre><code></p><p>Start (now):        x_start = [28, 45, 5]  (age, income_k, satisfaction)</p><p>Change per year:    d = [1, 3, 0.5]  (age +1, income +$3k, satisfaction +0.5)</p><p></p><p>Where will Alice be in t years?</p><p>x_future = x_start + t × d</p><p></p><p>In 5 years (t = 5):</p><p>x_future = [28, 45, 5] + 5 × [1, 3, 0.5]</p><p>         = [28, 45, 5] + [5, 15, 2.5]</p><p>         = [33, 60, 7.5]</p><pre><code></p><p></p><p>Alice at age 33, earning $60k, satisfaction 7.5!</p>
+    </section>
+
+    <!-- D) Where It Shows Up in ML -->
+    <section>
+        <h2>D) Where It Shows Up in ML</h2>
+        <p><strong>Plain words:</strong> Lines help us think about trends and gradual changes.</p><p></p><p><strong>In machine learning, "gradient descent" follows this exact pattern:</strong></p><p></p><p>`new_weights = old_weights - learning_rate × gradient`</p><p></p><p>This is the line equation! Start at old weights, move in the gradient direction. Each step improves your model's predictions.</p>
+        
+        <!-- Image Placeholder 2 -->
+        <div class="image-placeholder" role="img" aria-label="Gradient descent visualization with steps down a slope">
+            <p><strong>📊 Infographic: Gradient descent: step by step toward better predictions</strong></p>
+            <p class="prompt">Infographic prompt: "Animation-style diagram showing a ball rolling downhill in steps, labeled with gradient descent formula"</p>
+            <p><em>Alt text: Gradient descent visualization with steps down a slope</em></p>
+        </div>
+    </section>
+
+    <!-- E) Worked Example -->
+    <section>
+        <h2>E) Worked Numeric Example</h2>
+        <p></code></pre><p>Start (now):     x₀ = [25, 40]   (age, income_k)</p><p>Direction:       d  = [1, 2]     (each year: age +1, income +$2k)</p><p>Time:            t  = 3 years</p><p></p><p>Future position:</p><p>x = x₀ + t × d</p><p>x = [25, 40] + 3 × [1, 2]</p><p>x = [25, 40] + [3, 6]</p><p>x = [28, 46]</p><pre><code></p><p></p><p>In 3 years: age 28, income $46k.</p>
+    </section>
+
+    <!-- F) Python Code -->
+    <section>
+        <h2>F) Python (NumPy) Snippet</h2>
+        <pre><code>import numpy as np
+
+# Starting point
+x0 = np.array([25, 40])
+
+# Direction of change
+d = np.array([1, 2])
+
+# Calculate position at t = 0, 1, 2, 3
+for t in [0, 1, 2, 3]:
+    x = x0 + t * d
+    print(f"t = {t}: age = {x[0]}, income = $" + str(x[1]) + "k")
+
+# Output:
+# t = 0: age = 25, income = $40k
+# t = 1: age = 26, income = $42k
+# t = 2: age = 27, income = $44k
+# t = 3: age = 28, income = $46k</code></pre>
+        
+        <div class="try-it">
+            <h3>🧪 Try It Yourself</h3>
+            <p>Run this code in <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab</a> (free, no installation):</p>
+            <ol>
+                <li>Go to colab.research.google.com</li>
+                <li>Click "New Notebook"</li>
+                <li>Paste the code above into a cell</li>
+                <li>Press Shift+Enter to run</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- G) Key Takeaways -->
+    <section>
+        <h2>G) Key Takeaways</h2>
+        <div class="callout callout-success">
+            <p class="callout-title">✅ What to Remember</p>
+            <ul>
+                <li>Line = start point + t × direction</li>
+                <li>Changing t moves you along the line</li>
+                <li>Gradient descent (how models learn) follows this exact pattern</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- H) Common Mistakes -->
+    <section>
+        <h2>H) Common Mistakes</h2>
+        <div class="callout callout-error">
+            <p class="callout-title">❌ Avoid These Errors</p>
+            <ul>
+                <li>Forgetting that t can be negative (going backward on the line)</li>
+                <li>Confusing the direction vector with the destination point</li>
+                <li>Forgetting that in high dimensions, a 'line' is still just start + t × direction</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Practice Questions -->
+    <section>
+        <h2>📝 Practice Questions</h2>
+        
+        
+        <div class="practice-question">
+            <p><strong>Question 1:</strong> Given start = [10, 20] and direction = [2, 5], find the point at t = 4</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">[10, 20] + 4×[2, 5] = [10+8, 20+20] = [18, 40]</div>
+            </details>
+        </div>
+        
+        <div class="practice-question">
+            <p><strong>Question 2:</strong> In gradient descent, what does the 'direction' represent?</p>
+            <details>
+                <summary>Show Answer</summary>
+                <div class="answer">The gradient - the direction of steepest improvement for the model</div>
+            </details>
+        </div>
+        
+    </section>
+
+    <!-- Resources -->
+    <section class="resources">
+        <h3>📚 Learning Resources</h3>
+        
+        <p><strong>🎬 Video:</strong> Khan Academy: Parametric equations of lines<br>
+        <a href="https://khanacademy.org/math/multivariable-calculus" target="_blank" rel="noopener">https://khanacademy.org/math/multivariable-calculus</a></p>
+        
+        <p><strong>✏️ Practice:</strong> MIT OCW: Linear Algebra Problem Sets<br>
+        <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank" rel="noopener">https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/</a></p>
+        
+        <p><strong>🤖 Applied ML:</strong> Google ML Crash Course: Gradient Descent<br>
+        <a href="https://developers.google.com/machine-learning/crash-course/reducing-loss/gradient-descent" target="_blank" rel="noopener">https://developers.google.com/machine-learning/crash-course/reducing-loss/gradient-descent</a></p>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-links" aria-label="Lesson navigation">
+        <a href="cross-product.html">← Cross Product</a>
+        <a href="plane-equation.html">Plane Equation →</a>
+    </nav>
+</main>
+
+<footer>
+    <p><a href="index.html">← Back to Course Home</a></p>
+    <p>© 2026 Your Website Name</p>
+</footer>
+
+</body>
+</html>
